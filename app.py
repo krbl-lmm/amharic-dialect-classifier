@@ -1,5 +1,6 @@
 import tempfile
 import streamlit as st
+import pandas as pd
 
 from src.predict import predict_audio
 
@@ -27,14 +28,23 @@ if uploaded_file is not None:
 
     prediction, scores = predict_audio(temp_path)
 
-    st.success(f"Predicted Dialect: {prediction}")
+    top_score = max(scores.values())
+
+    st.success(f"{prediction} ({top_score:.1%})")
 
     st.subheader("Confidence Scores")
 
-    for dialect, score in sorted(
-        scores.items(),
-        key=lambda x: x[1],
-        reverse=True
-    ):
+    score_df = pd.DataFrame(
+        {
+            "Dialect": scores.keys(),
+            "Confidence": scores.values()
+        }
+    )
 
-        st.write(f"{dialect}: {score:.2%}")
+    score_df = score_df.sort_values(by="Confidence", ascending=False)
+
+    st.bar_chart(
+        score_df.set_index("Dialect"),
+        horizontal=True,
+        sort=False
+    )
