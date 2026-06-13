@@ -2,7 +2,7 @@
 
 data/
 
-models/*.pkl
+#models/*.pkl
 
 __pycache__/
 *.pyc
